@@ -8,6 +8,7 @@ const os = require('os');
 const remote = require('electron').remote;
 const screen = require('electron').screen;
 
+const app = remote.require('electron').app;
 const ipcMain = remote.require('electron').ipcMain;
 const BrowserWindow = remote.require('electron').BrowserWindow;
 
@@ -659,6 +660,7 @@ describe('browser-window module', function() {
     });
   });
 
+<<<<<<< HEAD
   describe('window.webContents.send(channel, args...)', function() {
     it('throws an error when the channel is missing', function() {
       assert.throws(function() {
@@ -668,6 +670,21 @@ describe('browser-window module', function() {
       assert.throws(function() {
         w.webContents.send(null);
       }, 'Missing required channel argument');
+=======
+  describe('dev tool extensions', function () {
+    it('serializes the registered extensions on quit', function () {
+      var extensionName = 'foo';
+      var extensionPath = path.join(__dirname, 'fixtures', 'devtools-extensions', extensionName);
+      var serializedPath = path.join(app.getPath('userData'), 'DevTools Extensions');
+
+      BrowserWindow.addDevToolsExtension(extensionPath);
+      app.emit('will-quit');
+      assert.deepEqual(JSON.parse(fs.readFileSync(serializedPath)), [extensionPath]);
+
+      BrowserWindow.removeDevToolsExtension(extensionName);
+      app.emit('will-quit');
+      assert.equal(fs.existsSync(serializedPath), false);
+>>>>>>> atom/dont-write-empty-dev-tools-extensions-file
     });
   });
 });
