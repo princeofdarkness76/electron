@@ -661,6 +661,7 @@ describe('browser-window module', function() {
   });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   describe('window.webContents.send(channel, args...)', function() {
     it('throws an error when the channel is missing', function() {
       assert.throws(function() {
@@ -671,6 +672,8 @@ describe('browser-window module', function() {
         w.webContents.send(null);
       }, 'Missing required channel argument');
 =======
+=======
+>>>>>>> origin/dont-write-empty-dev-tools-extensions-file
   describe('dev tool extensions', function () {
     it('serializes the registered extensions on quit', function () {
       var extensionName = 'foo';
@@ -684,7 +687,10 @@ describe('browser-window module', function() {
       BrowserWindow.removeDevToolsExtension(extensionName);
       app.emit('will-quit');
       assert.equal(fs.existsSync(serializedPath), false);
+<<<<<<< HEAD
 >>>>>>> atom/dont-write-empty-dev-tools-extensions-file
+=======
+>>>>>>> origin/dont-write-empty-dev-tools-extensions-file
     });
   });
 });
