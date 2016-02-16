@@ -103,11 +103,21 @@ describe('browser-window module', function() {
       w.loadURL('about:blank');
     });
 
-    it('should emit did-fail-load event', function(done) {
-      w.webContents.on('did-fail-load', function() {
+    it('should emit did-fail-load event for files that do not exist', function(done) {
+      w.webContents.on('did-fail-load', function(event, code) {
+        assert.equal(code, -6);
         done();
       });
       w.loadURL('file://a.txt');
+    });
+
+    it('should emit did-fail-load event for invalid URL', function(done) {
+      w.webContents.on('did-fail-load', function(event, code, desc) {
+        assert.equal(desc, 'ERR_INVALID_URL');
+        assert.equal(code, -300);
+        done();
+      });
+      w.loadURL('http://example:port');
     });
   });
 
@@ -469,10 +479,18 @@ describe('browser-window module', function() {
     });
   });
 
-  xdescribe('beginFrameSubscription method', function() {
+  describe('beginFrameSubscription method', function() {
+    this.timeout(20000);
+
     it('subscribes frame updates', function(done) {
+      let called = false;
       w.loadURL("file://" + fixtures + "/api/blank.html");
       w.webContents.beginFrameSubscription(function(data) {
+        // This callback might be called twice.
+        if (called)
+          return;
+        called = true;
+
         assert.notEqual(data.length, 0);
         w.webContents.endFrameSubscription();
         done();
@@ -691,6 +709,22 @@ describe('browser-window module', function() {
 >>>>>>> atom/dont-write-empty-dev-tools-extensions-file
 =======
 >>>>>>> origin/dont-write-empty-dev-tools-extensions-file
+    });
+  });
+
+  describe('dev tool extensions', function () {
+    it('serializes the registered extensions on quit', function () {
+      var extensionName = 'foo';
+      var extensionPath = path.join(__dirname, 'fixtures', 'devtools-extensions', extensionName);
+      var serializedPath = path.join(app.getPath('userData'), 'DevTools Extensions');
+
+      BrowserWindow.addDevToolsExtension(extensionPath);
+      app.emit('will-quit');
+      assert.deepEqual(JSON.parse(fs.readFileSync(serializedPath)), [extensionPath]);
+
+      BrowserWindow.removeDevToolsExtension(extensionName);
+      app.emit('will-quit');
+      assert.equal(fs.existsSync(serializedPath), false);
     });
   });
 });
